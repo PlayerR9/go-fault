@@ -24,6 +24,13 @@ type Fault interface {
 	// Returns:
 	//   - string: The error message of the fault.
 	Error() string
+
+	// InfoLines returns the info lines of the fault (i.e., any other information that is
+	// not conveyed by the Error() method).
+	//
+	// Returns:
+	//   - []string: The info lines.
+	InfoLines() []string
 }
 
 // Is checks whether the given fault is of the same type as the target fault.

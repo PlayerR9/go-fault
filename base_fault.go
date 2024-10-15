@@ -9,6 +9,9 @@ type baseFault[C FaultCode] struct {
 
 	// msg is the error message.
 	msg string
+
+	// context is the fault context.
+	context map[string]any
 }
 
 // Error implements the Fault interface.
@@ -36,6 +39,25 @@ func (f baseFault[C]) IsFault(target Fault) bool {
 	}
 
 	return false
+}
+
+// InfoLines returns the info lines of the fault (i.e., any other information that is
+// not conveyed by the Error() method).
+//
+// Returns:
+//   - []string: The info lines.
+func (bf baseFault[C]) InfoLines() []string {
+	var lines []string
+
+	if len(bf.context) > 0 {
+		lines = append(lines, "Context:")
+
+		for k, v := range bf.context {
+			lines = append(lines, fmt.Sprintf("- %s: %v", k, v))
+		}
+	}
+
+	return lines
 }
 
 // New creates a new Fault with the given fault code and message.
