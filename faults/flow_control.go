@@ -1,6 +1,10 @@
 package faults
 
-func try(flt *Fault, fn func()) {
+import (
+	flt "github.com/PlayerR9/go-fault"
+)
+
+func try(fault *flt.Fault, fn func()) {
 	defer func() {
 		r := recover()
 		if r == nil {
@@ -8,12 +12,12 @@ func try(flt *Fault, fn func()) {
 		}
 
 		switch r := r.(type) {
-		case Fault:
-			*flt = r
+		case flt.Fault:
+			*fault = r
 		case string:
-			*flt = FromString(r)
+			*fault = FromString(r)
 		case error:
-			*flt = FromError(r)
+			*fault = FromError(r)
 		default:
 
 		}
@@ -22,12 +26,12 @@ func try(flt *Fault, fn func()) {
 	fn()
 }
 
-func Try(fn func()) Fault {
+func Try(fn func()) flt.Fault {
 	if fn == nil {
 		return nil
 	}
 
-	var flt Fault
+	var flt flt.Fault
 
 	try(&flt, fn)
 
