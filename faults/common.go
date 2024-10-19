@@ -10,7 +10,17 @@ const (
 	Unknown       StdFaultCode = iota - 1 // UNKNOWN
 	FatalErr                              // FATAL
 	OperationFail                         // Operation Failed
+	BadParameter                          // Bad Parameter
 )
+
+// NewNilReceiver creates a new fault with the code BadParameter and the
+// message "Receiver must not be nil".
+//
+// Returns:
+//   - Fault: The new fault. Never returns nil.
+func NewNilReceiver() flt.Fault {
+	return flt.New(BadParameter, "Receiver must not be nil")
+}
 
 func FromString(s string) flt.Fault {
 	if s == "" {
