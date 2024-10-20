@@ -10,13 +10,14 @@ func _() {
 	var x [1]struct{}
 	_ = x[Unknown - -1]
 	_ = x[FatalErr-0]
-	_ = x[OperationFail-1]
-	_ = x[BadParameter-2]
+	_ = x[AssertFail-1]
+	_ = x[OperationFail-2]
+	_ = x[BadParameter-3]
 }
 
-const _StdFaultCode_name = "UNKNOWNFATALOperation FailedBad Parameter"
+const _StdFaultCode_name = "UNKNOWNFATALASSERTOperation FailedBad Parameter"
 
-var _StdFaultCode_index = [...]uint8{0, 7, 12, 28, 41}
+var _StdFaultCode_index = [...]uint8{0, 7, 12, 18, 34, 47}
 
 func (i StdFaultCode) String() string {
 	i -= -1

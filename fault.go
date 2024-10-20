@@ -1,14 +1,12 @@
 package faults
 
+import "fmt"
+
 // FaultCode is the type of a fault code.
 type FaultCode interface {
 	~int
 
-	// String returns the string representation of the fault code.
-	//
-	// Returns:
-	//   - string: The string representation of the fault code.
-	String() string
+	fmt.Stringer
 }
 
 // Fault is a fault.

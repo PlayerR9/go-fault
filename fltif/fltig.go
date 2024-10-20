@@ -4,11 +4,9 @@ import (
 	"fmt"
 
 	flt "github.com/PlayerR9/go-fault"
-
-	flts "github.com/PlayerR9/go-fault/faults"
 )
 
-// Cond asserts whether the condition is true. If not, it panics with an
+// Cond asserts whether the condition is true. If not, it returns a fault with an
 // ErrAssertFailed error.
 //
 // Parameters:
@@ -23,7 +21,7 @@ func Cond(cond bool, msg string) flt.Fault {
 		return nil
 	}
 
-	return flt.New(flts.OperationFail, msg)
+	return NewAssertFail(msg)
 }
 
 // Condf is the same as Cond, but with a format string.
@@ -41,7 +39,7 @@ func Condf(cond bool, format string, args ...any) flt.Fault {
 		return nil
 	}
 
-	return flt.Newf(flts.OperationFail, format, args...)
+	return NewAssertFail(fmt.Sprintf(format, args...))
 }
 
 // Err asserts whether the error is nil. If not, it panics with an
@@ -68,7 +66,7 @@ func Err(inner error, format string, args ...any) flt.Fault {
 	msg := fmt.Sprintf(format, args...)
 	msg += " = " + inner.Error()
 
-	return flt.New(flts.OperationFail, msg)
+	return NewAssertFail(msg)
 }
 
 // True is just syntactic sugar for the Condf function but used for when functions
@@ -95,7 +93,7 @@ func True(ok bool, format string, args ...any) flt.Fault {
 	msg := fmt.Sprintf(format, args...)
 	msg += " = false"
 
-	return flt.New(flts.OperationFail, msg)
+	return NewAssertFail(msg)
 }
 
 // False is the same as True, but checks for false instead of true.
@@ -121,7 +119,7 @@ func False(ok bool, format string, args ...any) flt.Fault {
 	msg := fmt.Sprintf(format, args...)
 	msg += " = true"
 
-	return flt.New(flts.OperationFail, msg)
+	return NewAssertFail(msg)
 }
 
 // NotNil asserts whether the variable is non-nil according to the IsNiler interface. If
@@ -152,7 +150,7 @@ func NotNil(v interface {
 		name = "variable"
 	}
 
-	return flt.New(flts.OperationFail, name+" = nil")
+	return NewAssertFail(name + " = nil")
 }
 
 // NotZero asserts whether the variable is not its zero value. If not, it
@@ -180,7 +178,7 @@ func NotZero[T comparable](v T, name string) flt.Fault {
 
 	msg := fmt.Sprintf("%s = %v", name, v)
 
-	return flt.New(flts.OperationFail, msg)
+	return NewAssertFail(msg)
 }
 
 // Type asserts whether the variable is of type T. If not, it panics with an
@@ -201,7 +199,7 @@ func Type[T any](v any, name string, allow_nil bool) flt.Fault {
 	}
 
 	if v == nil && !allow_nil {
-		return flt.New(flts.OperationFail, name+" = nil")
+		return NewAssertFail(name + " = nil")
 	} else if v == nil {
 		return nil
 	}
@@ -210,7 +208,7 @@ func Type[T any](v any, name string, allow_nil bool) flt.Fault {
 	if !ok {
 		msg := fmt.Sprintf("%s = %T, want %T", name, v, *new(T))
 
-		return flt.New(flts.OperationFail, msg)
+		return NewAssertFail(msg)
 	}
 
 	return nil
@@ -238,7 +236,7 @@ func Deref[T any](v any, name string) (T, flt.Fault) {
 	if v == nil {
 		msg := fmt.Sprintf("%s = nil, want %T", name, *new(T))
 
-		return *new(T), flt.New(flts.OperationFail, msg)
+		return *new(T), NewAssertFail(msg)
 	}
 
 	switch v := v.(type) {
@@ -249,7 +247,7 @@ func Deref[T any](v any, name string) (T, flt.Fault) {
 	default:
 		msg := fmt.Sprintf("%s = %T, want %T", name, v, *new(T))
 
-		return *new(T), flt.New(flts.OperationFail, msg)
+		return *new(T), NewAssertFail(msg)
 	}
 }
 
@@ -276,13 +274,13 @@ func Deref[T any](v any, name string) (T, flt.Fault) {
 //	res := New(NewMyStruct()) // Panics: *MyStruct = nil
 func New[T interface{ IsNil() bool }](res T, err error) (T, flt.Fault) {
 	if err != nil {
-		return *new(T), flt.New(flts.OperationFail, "err = "+err.Error())
+		return *new(T), NewAssertFail("err = " + err.Error())
 	}
 
 	if res.IsNil() {
 		msg := fmt.Sprintf("%T = nil", *new(T))
 
-		return *new(T), flt.New(flts.OperationFail, msg)
+		return *new(T), NewAssertFail(msg)
 	}
 
 	return res, nil
@@ -306,14 +304,14 @@ func Conv[T any](v any, name string) (T, flt.Fault) {
 	}
 
 	if v == nil {
-		return *new(T), flt.New(flts.OperationFail, name+" = nil")
+		return *new(T), NewAssertFail(name + " = nil")
 	}
 
 	val, ok := v.(T)
 	if !ok {
 		msg := fmt.Sprintf("%s = %T, want %T", name, v, *new(T))
 
-		return *new(T), flt.New(flts.OperationFail, msg)
+		return *new(T), NewAssertFail(msg)
 	}
 
 	return val, nil
