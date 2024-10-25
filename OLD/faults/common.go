@@ -1,7 +1,7 @@
 package faults
 
 import (
-	flt "github.com/PlayerR9/go-fault"
+	flt "github.com/PlayerR9/go-fault/OLD"
 )
 
 // StdFaultCode is the type of a standard fault code.

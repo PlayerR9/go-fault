@@ -1,6 +1,8 @@
 package faults
 
 import (
+	"fmt"
+
 	flt "github.com/PlayerR9/go-fault"
 )
 
@@ -15,11 +17,11 @@ func try(fault *flt.Fault, fn func()) {
 		case flt.Fault:
 			*fault = r
 		case string:
-			*fault = FromString(r)
+			*fault = flt.New(Unknown, r)
 		case error:
-			*fault = FromError(r)
+			*fault = flt.New(Unknown, r.Error())
 		default:
-
+			*fault = flt.New(Unknown, fmt.Sprintf("panic: %v", r))
 		}
 	}()
 
@@ -31,9 +33,9 @@ func Try(fn func()) flt.Fault {
 		return nil
 	}
 
-	var flt flt.Fault
+	var fault flt.Fault
 
-	try(&flt, fn)
+	try(&fault, fn)
 
-	return flt
+	return fault
 }

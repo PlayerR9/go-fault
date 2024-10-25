@@ -1,71 +1,79 @@
-package faults
+package fault
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
-// FaultCode is the type of a fault code.
 type FaultCode interface {
 	~int
 
-	fmt.Stringer
+	String() string
 }
 
-// Fault is a fault.
 type Fault interface {
-	// Embeds returns the base of the fault.
-	//
-	// Returns:
-	//   - Fault: The base of the fault.
-	Embeds() Fault
-
-	// Error returns the error message of the fault.
-	//
-	// Returns:
-	//   - string: The error message of the fault.
 	Error() string
-
-	// InfoLines returns the info lines of the fault (i.e., any other information that is
-	// not conveyed by the Error() method).
-	//
-	// Returns:
-	//   - []string: The info lines.
-	InfoLines() []string
 }
 
-// Is checks whether the given fault is of the same type as the target fault.
-//
-// If the target fault is nil, Is returns false.
-//
-// Otherwise, Is returns true if the given fault is of the same type as the target fault,
-// i.e. if the given fault's error code is the same as the fault code of the target fault.
-//
-// If the given fault does not have an error code, Is checks whether the given fault
-// is the same as the target fault or whether the given fault has the target fault as its base.
-//
-// If the given fault has an error code and the target fault does not, Is returns false.
-//
-// Parameters:
-//   - fault: The fault to check.
-//   - target: The target fault.
-//
-// Returns:
-//   - bool: True if the given fault is of the same type as the target fault, false otherwise.
-func Is(fault Fault, target Fault) bool {
+type baseFault[C FaultCode] struct {
+	code    C
+	msg     string
+	context map[string]any
+}
+
+func (f baseFault[C]) Error() string {
+	return "(" + f.code.String() + ") " + f.msg
+}
+
+func New[C FaultCode](code C, msg string) Fault {
+	msg = strings.TrimSpace(msg)
+	if msg == "" {
+		msg = "something went wrong"
+	}
+
+	return &baseFault[C]{
+		code: code,
+		msg:  msg,
+	}
+}
+
+func (f baseFault[C]) Embeds() Fault {
+	return nil
+}
+
+func (f baseFault[C]) IsFault(target Fault) bool {
 	if target == nil {
 		return false
 	}
 
-	for fault != nil {
-		if fault == target {
-			return true
-		}
-
-		flt, ok := fault.(interface{ IsFault(Fault) bool })
-		if ok {
-			return flt.IsFault(target)
-		}
-
-		fault = fault.Embeds()
+	b, ok := target.(*baseFault[C])
+	if !ok {
+		return false
 	}
 
-	return false
+	return b.code == f.code && strings.EqualFold(f.msg, b.msg)
+}
+
+func (f baseFault[C]) InfoLines() []string {
+	var lines []string
+
+	if len(f.context) > 0 {
+		lines = append(lines, "Context:")
+
+		for k, v := range f.context {
+			lines = append(lines, fmt.Sprintf("- %s: %v", k, v))
+		}
+	}
+
+	return lines
+}
+
+func (f *baseFault[C]) WithContext(k string, v any) Fault {
+	if f.context == nil {
+		f.context = make(map[string]any)
+	}
+
+	f.context[k] = v
+
+	return f
 }
