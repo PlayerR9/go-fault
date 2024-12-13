@@ -1,0 +1,40 @@
+package faults
+
+// BlueprintOf returns the blueprint of the given fault.
+//
+// Parameters:
+//   - fault: The fault for which to retrieve the blueprint.
+//
+// Returns:
+//   - Blueprint: The blueprint of the fault, or nil if the fault is nil or does not
+//     implement the Blueprint method.
+func BlueprintOf(fault Fault) Blueprint {
+	if fault == nil {
+		return nil
+	}
+
+	f, ok := fault.(interface{ Blueprint() Blueprint })
+	if !ok {
+		return nil
+	}
+
+	blueprint := f.Blueprint()
+	return blueprint
+}
+
+func Is(target, other Fault) bool {
+	if target == nil || other == nil {
+		return false
+	} else if target == other {
+		return true
+	}
+
+	b1 := BlueprintOf(target)
+	b2 := BlueprintOf(other)
+
+	if b1 != nil && b2 != nil && b1 == b2 {
+		return true
+	}
+
+	panic("not implemented")
+}

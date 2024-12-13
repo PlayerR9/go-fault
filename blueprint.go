@@ -15,5 +15,7 @@ type Blueprint interface {
 	//
 	// Returns:
 	//   - Fault: The new Fault. Never returns nil.
+	//
+	// This function generates a different pointer for each call.
 	Init(msg string) Fault
 }

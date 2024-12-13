@@ -8,7 +8,7 @@ type Fault interface {
 	//   - string: The error message.
 	Error() string
 
-	// Init creates a new Fault with the given message and who shares the
+	// InstanceOf creates a new Fault with the given message and who shares the
 	// same blueprint.
 	//
 	// Parameters:
@@ -16,7 +16,11 @@ type Fault interface {
 	//
 	// Returns:
 	//   - Fault: The new Fault. Never returns nil.
-	Init(msg string) Fault
+	//
+	// Unlike with Init of Blueprint, this function returns a new fault that shares
+	// the same pointer to the blueprint as the original. Thus, all faults that
+	// are generated with this function are loosely comparable.
+	InstanceOf(msg string) Fault
 }
 
 // NewFault creates a new Fault with the given name and message.

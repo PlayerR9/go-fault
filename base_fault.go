@@ -14,10 +14,18 @@ func (f baseFault) Error() string {
 	return f.msg
 }
 
-// Init implements Fault.
-func (f baseFault) Init(msg string) Fault {
+// InstanceOf implements Fault.
+func (f baseFault) InstanceOf(msg string) Fault {
 	return &baseFault{
 		blueprint: f.blueprint,
 		msg:       msg,
 	}
+}
+
+// Blueprint returns the blueprint of the fault.
+//
+// Returns:
+//   - Blueprint: The blueprint of the fault. Never returns nil.
+func (f baseFault) Blueprint() Blueprint {
+	return f.blueprint
 }
