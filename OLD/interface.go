@@ -1,6 +1,6 @@
 package faults
 
-import "github.com/PlayerR9/go-fault/internal"
+import "github.com/PlayerR9/go-fault/OLD/internal"
 
 // Fault is the interface for a fault.
 type Fault interface {

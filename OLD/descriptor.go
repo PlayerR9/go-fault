@@ -3,7 +3,7 @@ package faults
 import (
 	"fmt"
 
-	"github.com/PlayerR9/go-fault/internal"
+	"github.com/PlayerR9/go-fault/OLD/internal"
 )
 
 // Descriptor is the interface for a fault descriptor.
